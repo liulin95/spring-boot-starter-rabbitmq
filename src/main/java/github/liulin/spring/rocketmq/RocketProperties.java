@@ -8,15 +8,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "rocketmq")
 public class RocketProperties {
-    private String namesrvName;
+    private String namesrvAddr;
     private String producerGroup;
 
-    public String getNamesrvName() {
-        return namesrvName;
+    public String getNamesrvAddr() {
+        return namesrvAddr;
     }
 
-    public void setNamesrvName(String namesrvName) {
-        this.namesrvName = namesrvName;
+    public void setNamesrvAddr(String namesrvAddr) {
+        this.namesrvAddr = namesrvAddr;
     }
 
     public String getProducerGroup() {

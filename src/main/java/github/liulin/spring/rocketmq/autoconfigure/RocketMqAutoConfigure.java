@@ -1,6 +1,7 @@
 package github.liulin.spring.rocketmq.autoconfigure;
 
 import github.liulin.spring.rocketmq.RocketProperties;
+import github.liulin.spring.rocketmq.annotation.RocketMqListenerAnnotationBeanPostProcessor;
 import github.liulin.spring.rocketmq.core.RocketTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,10 +19,16 @@ public class RocketMqAutoConfigure {
     @Autowired
     private RocketProperties properties;
 
-    @Bean(initMethod = "init",destroyMethod = "destroy")
+    @Bean(initMethod = "init", destroyMethod = "destroy")
     @ConditionalOnMissingBean(RocketTemplate.class)
-    public RocketTemplate rocketTemplate(){
-        RocketTemplate rocketTemplate = new RocketTemplate(properties.getNamesrvName(),properties.getProducerGroup());
+    public RocketTemplate rocketTemplate() {
+        RocketTemplate rocketTemplate = new RocketTemplate(properties.getNamesrvAddr(), properties.getProducerGroup());
         return rocketTemplate;
     }
+
+    @Bean
+    public RocketMqListenerAnnotationBeanPostProcessor rocketMqListenerAnnotationBeanPostProcessor() {
+        return new RocketMqListenerAnnotationBeanPostProcessor();
+    }
+
 }
