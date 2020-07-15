@@ -2,6 +2,7 @@ package github.liulin.spring.rocketmq.autoconfigure;
 
 import github.liulin.spring.rocketmq.RocketProperties;
 import github.liulin.spring.rocketmq.annotation.RocketMqListenerAnnotationBeanPostProcessor;
+import github.liulin.spring.rocketmq.core.RocketMqListenerRegistry;
 import github.liulin.spring.rocketmq.core.RocketTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,8 +28,15 @@ public class RocketMqAutoConfigure {
     }
 
     @Bean
-    public RocketMqListenerAnnotationBeanPostProcessor rocketMqListenerAnnotationBeanPostProcessor() {
-        return new RocketMqListenerAnnotationBeanPostProcessor();
+    public RocketMqListenerRegistry rocketMqListenerRegistry() {
+        return new RocketMqListenerRegistry();
+    }
+
+    @Bean
+    public RocketMqListenerAnnotationBeanPostProcessor rocketMqListenerAnnotationBeanPostProcessor(RocketMqListenerRegistry rocketMqListenerRegistry) {
+        RocketMqListenerAnnotationBeanPostProcessor processor = new RocketMqListenerAnnotationBeanPostProcessor();
+        processor.setListenerRegistry(rocketMqListenerRegistry);
+        return processor;
     }
 
 }
