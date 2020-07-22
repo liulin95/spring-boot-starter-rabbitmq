@@ -46,7 +46,7 @@ public class RocketMqPushConsumerRegistry implements SmartInitializingSingleton,
                                         method.invoke(containerBean, msgs, context);
                                         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
                                     } catch (Exception e) {
-                                        logger.error("RocketMq consumer[{}:{}] error:", consumer.getConsumerGroup(), consumer.getInstanceName(), e);
+                                        logger.error("RocketMq consumer [{}:{}] error:", consumer.getConsumerGroup(), consumer.getInstanceName(), e);
                                         return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                                     }
                                 }
@@ -59,7 +59,7 @@ public class RocketMqPushConsumerRegistry implements SmartInitializingSingleton,
                                         method.invoke(containerBean, msgs, context);
                                         return ConsumeOrderlyStatus.SUCCESS;
                                     } catch (Exception e) {
-                                        logger.error("RocketMq consumer[{}:{}] error:", consumer.getConsumerGroup(), consumer.getInstanceName(), e);
+                                        logger.error("RocketMq consumer [{}:{}] error:", consumer.getConsumerGroup(), consumer.getInstanceName(), e);
                                         return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
                                     }
                                 }
@@ -109,9 +109,9 @@ public class RocketMqPushConsumerRegistry implements SmartInitializingSingleton,
             for (DefaultMQPushConsumer consumer : consumerList) {
                 try {
                     consumer.start();
-                    logger.debug("The listener[{}] defined in class[{}]  has started successful", consumer.getConsumerGroup() + ":" + consumer.getInstanceName(), entry.getKey().getDeclaringClass().getName());
+                    logger.debug("The listener [{}] defined in class [{}]  has started successful", consumer.getConsumerGroup() + ":" + consumer.getInstanceName(), entry.getKey().getDeclaringClass().getName());
                 } catch (MQClientException e) {
-                    logger.error("The listener[{}] defined in class[{}] can't start:", consumer.getConsumerGroup() + ":" + consumer.getInstanceName(), entry.getKey().getDeclaringClass().getName(), e);
+                    logger.error("The listener [{}] defined in class [{}] can't start:", consumer.getConsumerGroup() + ":" + consumer.getInstanceName(), entry.getKey().getDeclaringClass().getName(), e);
                 }
             }
         }
@@ -122,7 +122,7 @@ public class RocketMqPushConsumerRegistry implements SmartInitializingSingleton,
             List<DefaultMQPushConsumer> consumerList = entry.getValue();
             for (DefaultMQPushConsumer consumer : consumerList) {
                 consumer.shutdown();
-                logger.debug("The listener[{}] defined in class[{}]  shutdown now", consumer.getConsumerGroup() + ":" + consumer.getInstanceName(), entry.getKey().getDeclaringClass().getName());
+                logger.debug("The listener [{}] defined in class [{}]  shutdown now", consumer.getConsumerGroup() + ":" + consumer.getInstanceName(), entry.getKey().getDeclaringClass().getName());
             }
         }
     }

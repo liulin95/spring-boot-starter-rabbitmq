@@ -1,4 +1,4 @@
-package github.liulin.spring.rocketmq.autoconfigure;
+package github.liulin.spring.rocketmq.configure;
 
 import github.liulin.spring.rocketmq.RocketProperties;
 import github.liulin.spring.rocketmq.core.RocketMqListenerAnnotationBeanPostProcessor;
@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
  * @author liulin
  * @version $Id: RocketMqAutoConfigure.java, v0.1 2020/7/14 14:18 liulin Exp $$
  */
-@Configuration
+//@Configuration
 @EnableConfigurationProperties(value = RocketProperties.class)
-public class RocketMqAutoConfigure {
+public class RocketMqConfigure {
     @Autowired
     private RocketProperties properties;
 
