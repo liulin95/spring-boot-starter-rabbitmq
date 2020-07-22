@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-@Component
+//@Component
 public class TestListener {
 
     @RocketMqPushConsumer(consumerGroup = "test01",topic = "TopicTest")

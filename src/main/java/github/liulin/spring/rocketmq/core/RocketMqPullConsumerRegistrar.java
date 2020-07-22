@@ -1,12 +1,15 @@
 package github.liulin.spring.rocketmq.core;
 
 import github.liulin.spring.rocketmq.annotation.RocketMqPullConsumer;
+import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -51,17 +54,38 @@ public class RocketMqPullConsumerRegistrar implements ImportBeanDefinitionRegist
 
     private void registerToRegistry(BeanDefinitionRegistry registry, AnnotatedBeanDefinition definition) {
         AnnotationMetadata metadata = definition.getMetadata();
-        Map attributes = definition.getMetadata().getAnnotationAttributes(RocketMqPullConsumer.class.getName());
-
+        Map<String, Object> attributes = definition.getMetadata().getAnnotationAttributes(RocketMqPullConsumer.class.getName());
 
 
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(RocketMqPullConsumerFactoryBean.class);
+        builder.addPropertyValue("type", metadata.getClassName());
 
+        DefaultLitePullConsumer consumer = new DefaultLitePullConsumer();
+        String namesrvAddr = attributes.get("namesrvAddr").equals("") ? environment.getProperty("rocketmq.namesrvAddr") : attributes.get("namesrvAddr").toString();
+        consumer.setNamesrvAddr(namesrvAddr);
+        consumer.setAutoCommit((Boolean) attributes.get("autoCommit"));
+        consumer.setInstanceName((String) attributes.get("instanceName"));
+        consumer.setConsumerGroup((String) attributes.get("consumerGroup"));
+        try {
+            consumer.subscribe((String) attributes.get("topic"), (String) attributes.get("subExpression"));
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        }
+        consumer.setPullBatchSize((Integer) attributes.get("pullBatchSize"));
+        consumer.setMessageModel((MessageModel) attributes.get("messageModel"));
+        builder.addPropertyValue("consumer", consumer);
         BeanDefinition proxyBeanDefinition = builder.getBeanDefinition();
+        // 设置别名
+        String[] name = (String[]) attributes.get("name");
+        String classFullName = metadata.getClassName();
+        if (name.length == 0) {
+            int lastPointIdx = classFullName.lastIndexOf(".");
+            String className = classFullName.substring(lastPointIdx + 1, lastPointIdx + 2).toLowerCase() + classFullName.substring(lastPointIdx + 2);
+            name = new String[]{className};
+        }
 
-
-        BeanDefinitionHolder holder = new BeanDefinitionHolder(proxyBeanDefinition,metadata.getClassName());
-
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(proxyBeanDefinition, metadata.getClassName(), name);
+        BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
     }
 
     private ClassPathScanningCandidateComponentProvider getScanner() {

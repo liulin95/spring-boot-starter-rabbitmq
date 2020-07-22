@@ -1,6 +1,7 @@
 package github.liulin.spring.rocketmq.annotation;
 
 import github.liulin.spring.rocketmq.configure.RocketMqConfigure;
+import github.liulin.spring.rocketmq.core.RocketMqPullConsumerRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -12,6 +13,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import(value = {RocketMqConfigure.class})
+@Import(value = {RocketMqConfigure.class, RocketMqPullConsumerRegistrar.class})
 public @interface EnableRocketMq {
 }
