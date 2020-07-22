@@ -1,8 +1,8 @@
 package github.liulin.spring.rocketmq.autoconfigure;
 
 import github.liulin.spring.rocketmq.RocketProperties;
-import github.liulin.spring.rocketmq.annotation.RocketMqListenerAnnotationBeanPostProcessor;
-import github.liulin.spring.rocketmq.core.RocketMqListenerRegistry;
+import github.liulin.spring.rocketmq.core.RocketMqListenerAnnotationBeanPostProcessor;
+import github.liulin.spring.rocketmq.core.RocketMqPushConsumerRegistry;
 import github.liulin.spring.rocketmq.core.RocketTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,15 +27,15 @@ public class RocketMqAutoConfigure {
         return rocketTemplate;
     }
 
-    @Bean
-    public RocketMqListenerRegistry rocketMqListenerRegistry() {
-        return new RocketMqListenerRegistry();
+    @Bean(destroyMethod = "destroy")
+    public RocketMqPushConsumerRegistry rocketMqListenerRegistry() {
+        return new RocketMqPushConsumerRegistry();
     }
 
     @Bean
-    public RocketMqListenerAnnotationBeanPostProcessor rocketMqListenerAnnotationBeanPostProcessor(RocketMqListenerRegistry rocketMqListenerRegistry) {
+    public RocketMqListenerAnnotationBeanPostProcessor rocketMqListenerAnnotationBeanPostProcessor(RocketMqPushConsumerRegistry rocketMqPushConsumerRegistry) {
         RocketMqListenerAnnotationBeanPostProcessor processor = new RocketMqListenerAnnotationBeanPostProcessor();
-        processor.setListenerRegistry(rocketMqListenerRegistry);
+        processor.setListenerRegistry(rocketMqPushConsumerRegistry);
         return processor;
     }
 

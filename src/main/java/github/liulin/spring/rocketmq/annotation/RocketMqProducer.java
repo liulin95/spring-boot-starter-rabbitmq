@@ -6,6 +6,7 @@ package github.liulin.spring.rocketmq.annotation;
  */
 public @interface RocketMqProducer {
     String namesrvAddr() default "";
+
     String producerGroup() default "";
 
 }

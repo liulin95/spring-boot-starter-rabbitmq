@@ -11,10 +11,8 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-@Repeatable(RocketMqListeners.class)
-public @interface RocketMqListener {
-    String type() default "";
-
+@Repeatable(RocketMqPushConsumers.class)
+public @interface RocketMqPushConsumer {
     String namesrvAddr() default "";
 
     String consumerGroup();

@@ -18,13 +18,13 @@ public class RocketTemplate implements RocketProducer {
     public static final Logger logger = LoggerFactory.getLogger(RocketTemplate.class);
     private DefaultMQProducer mqProducer;
 
-    public RocketTemplate(String namesrvAddr, String producerGroup){
+    public RocketTemplate(String namesrvAddr, String producerGroup) {
         mqProducer = new DefaultMQProducer();
         mqProducer.setNamesrvAddr(namesrvAddr);
         mqProducer.setProducerGroup(producerGroup);
     }
 
-    public RocketTemplate(DefaultMQProducer mqProducer){
+    public RocketTemplate(DefaultMQProducer mqProducer) {
         this.mqProducer = mqProducer;
     }
 

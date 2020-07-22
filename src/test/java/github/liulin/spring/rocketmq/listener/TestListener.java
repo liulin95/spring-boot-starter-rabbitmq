@@ -1,6 +1,6 @@
 package github.liulin.spring.rocketmq.listener;
 
-import github.liulin.spring.rocketmq.annotation.RocketMqListener;
+import github.liulin.spring.rocketmq.annotation.RocketMqPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class TestListener {
 
-    @RocketMqListener(consumerGroup = "test01",topic = "TopicTest")
+    @RocketMqPushConsumer(consumerGroup = "test01",topic = "TopicTest")
     public void handle(List<MessageExt> msgs, ConsumeConcurrentlyContext context){
         for (MessageExt msg : msgs) {
 
