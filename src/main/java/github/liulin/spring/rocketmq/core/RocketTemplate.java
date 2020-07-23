@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * MQ Producer 内置实现
@@ -68,9 +71,43 @@ public class RocketTemplate implements RocketProducer {
     }
 
     @Override
+    public boolean sendBatch(String topic, List<String> msgs) {
+        List<Message> messageList = msgs.stream().map(msg -> {
+            Message message = new Message();
+            message.setTopic(topic);
+            byte[] bytes;
+            if (msg != null) {
+                try {
+                    bytes = msg.getBytes(DEFAULT_ENCODING);
+                    message.setBody(bytes);
+                    return message;
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        try {
+            return mqProducer.send(messageList).getSendStatus().equals(SendStatus.SEND_OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public SendResult send(Message message) {
         try {
             return mqProducer.send(message);
+        } catch (Exception e) {
+            logger.error("RocketMq send message error:", e);
+        }
+        return null;
+    }
+
+    public SendResult send(List<Message> messages) {
+        try {
+            return mqProducer.send(messages);
         } catch (Exception e) {
             logger.error("RocketMq send message error:", e);
         }
