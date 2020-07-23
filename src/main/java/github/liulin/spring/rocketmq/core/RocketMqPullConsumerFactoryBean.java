@@ -6,10 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.cglib.proxy.Enhancer;
 
 import java.lang.reflect.Proxy;
 
 /**
+ * PullConsumer的代理bean
+ *
  * @author liulin
  * @version $Id: RocketMqPullConsumerFactoryBean.java, v0.1 2020/7/22 17:10 liulin Exp $$
  */
@@ -23,12 +26,19 @@ public class RocketMqPullConsumerFactoryBean implements FactoryBean, SmartInitia
 
     @Override
     public Object getObject() throws Exception {
+        //创建代理 仅代理poll和获取consumer实例两个方法
         Object proxy;
         if (type.isInterface()) {
-            proxy = Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new RocketMqPullConsumerHandler(consumer));
+            //没有实现类，使用java动态代理
+            proxy = Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new RocketMqPullConsumerInvocationHandler(consumer, this));
         } else {
-            Object target = type.newInstance();
-            proxy = Proxy.newProxyInstance(type.getClassLoader(), type.getInterfaces(), new RocketMqPullConsumerHandler(consumer, target));
+            //存在实现类，使用CGLIB
+            Enhancer enhancer = new Enhancer();
+            enhancer.setCallback(new RocketMqPullConsumerMethodInterceptor(consumer));
+            enhancer.setClassLoader(type.getClassLoader());
+            enhancer.setSuperclass(type);
+            enhancer.setInterfaces(type.getInterfaces());
+            proxy = enhancer.create();
         }
 
         return proxy;
@@ -40,10 +50,6 @@ public class RocketMqPullConsumerFactoryBean implements FactoryBean, SmartInitia
             return null;
         }
         return type;
-//        if (type.isInterface()) {
-//            return type;
-//        }
-//        return PullConsumer.class;
     }
 
     public void init() {
@@ -68,6 +74,9 @@ public class RocketMqPullConsumerFactoryBean implements FactoryBean, SmartInitia
     }
 
     @Override
+    /**
+     * 所有bean加载完毕后，启动consumer
+     */
     public void afterSingletonsInstantiated() {
         try {
             consumer.start();
@@ -77,5 +86,14 @@ public class RocketMqPullConsumerFactoryBean implements FactoryBean, SmartInitia
             logger.debug("The pull consumer [{}:{}] defined in class [{}]   can't start:",
                     consumer.getConsumerGroup(), consumer.getInstanceName(), type.getName(), e);
         }
+    }
+
+    /**
+     * 销毁方法
+     */
+    public void destroy() {
+        consumer.shutdown();
+        logger.debug("The pull consumer [{}:{}] defined in class [{}] shutdown now.",
+                consumer.getConsumerGroup(), consumer.getInstanceName(), type.getName());
     }
 }

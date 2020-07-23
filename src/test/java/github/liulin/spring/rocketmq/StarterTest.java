@@ -20,13 +20,14 @@ public class StarterTest {
     public void autoConfigTest() throws InterruptedException, UnsupportedEncodingException {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TestConfigure.class);
 //        context.
-        PullConsumer consumer = (PullConsumer) context.getBean("testPullListener");
-        System.out.println(consumer.toString());
-        List<MessageExt> list = consumer.poll();
-        for (MessageExt msg : list) {
-            String content = new String(msg.getBody(), "utf-8");
-            System.out.println(content);
-        }
+        TestPullListener consumer = (TestPullListener) context.getBean("testPullListener");
+        consumer.handle();
+//        System.out.println(consumer.toString());
+//        List<MessageExt> list = consumer.poll();
+//        for (MessageExt msg : list) {
+//            String content = new String(msg.getBody(), "utf-8");
+//            System.out.println(content);
+//        }
         Thread.currentThread().join();
     }
 

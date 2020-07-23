@@ -36,11 +36,12 @@ public class RocketMqListenerAnnotationBeanPostProcessor implements BeanPostProc
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> targetClass = AopUtils.getTargetClass(bean);
         if (!noListenerClass.contains(bean.getClass())) {
-            Set<RocketMqPushConsumer> annotatedClass = findListenerAnnotations(targetClass);
-            Map<Method, Set<RocketMqPushConsumer>> annotatedMethod = MethodIntrospector.selectMethods(targetClass, (MethodIntrospector.MetadataLookup) method -> {
-                Set<RocketMqPushConsumer> methods = findListenerAnnotations(method);
-                return methods.size() > 0 ? methods : null;
-            });
+            Set<RocketMqPushConsumer> annotatedClass = findListenerAnnotations(targetClass); //注解在类上
+            Map<Method, Set<RocketMqPushConsumer>> annotatedMethod = MethodIntrospector.selectMethods(targetClass, //注解在方法上
+                    (MethodIntrospector.MetadataLookup) method -> {
+                        Set<RocketMqPushConsumer> methods = findListenerAnnotations(method);
+                        return methods.size() > 0 ? methods : null;
+                    });
             if (!annotatedMethod.isEmpty()) {
                 for (Map.Entry<Method, Set<RocketMqPushConsumer>> entry : annotatedMethod.entrySet()) {
                     listenerRegistry.register(entry.getKey(), entry.getValue());
@@ -49,9 +50,11 @@ public class RocketMqListenerAnnotationBeanPostProcessor implements BeanPostProc
                 noListenerClass.add(bean.getClass());
             }
             if (!annotatedClass.isEmpty()) {
+                // 查找消息处理方法
                 Set<Method> handlerMethods = MethodIntrospector.selectMethods(targetClass, (ReflectionUtils.MethodFilter) method ->
                         AnnotationUtils.findAnnotation(method, RocketMqHandler.class) != null);
                 if (!handlerMethods.isEmpty()) {
+                    // 在类上的注解内部只取一个处理消息的方法
                     if (handlerMethods.size() > 1) {
                         logger.warn("Annotation 'RocketMqPushListener' work on class only support one handler, class : {}", bean.getClass());
                     }
@@ -63,6 +66,12 @@ public class RocketMqListenerAnnotationBeanPostProcessor implements BeanPostProc
         return bean;
     }
 
+    /**
+     * 类级别查找带有注解的类
+     *
+     * @param targetClass
+     * @return
+     */
     private Set<RocketMqPushConsumer> findListenerAnnotations(Class<?> targetClass) {
         Set<RocketMqPushConsumer> listenerSet = new HashSet<>();
         RocketMqPushConsumer listener = AnnotationUtils.findAnnotation(targetClass, RocketMqPushConsumer.class);
@@ -76,6 +85,12 @@ public class RocketMqListenerAnnotationBeanPostProcessor implements BeanPostProc
         return listenerSet;
     }
 
+    /**
+     * 查找带有注解的方法
+     *
+     * @param method
+     * @return
+     */
     private Set<RocketMqPushConsumer> findListenerAnnotations(Method method) {
         Set<RocketMqPushConsumer> listenerSet = new HashSet<>();
         RocketMqPushConsumer listener = AnnotationUtils.findAnnotation(method, RocketMqPushConsumer.class);

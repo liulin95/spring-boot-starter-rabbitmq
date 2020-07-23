@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
+ * 添加此注解以启动自动注入
+ *
  * @author liulin
  * @version $Id: EnableRocketMq.java, v0.1 2020/7/22 15:48 liulin Exp $$
  */

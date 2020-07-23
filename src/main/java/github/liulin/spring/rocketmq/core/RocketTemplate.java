@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 
 /**
+ * MQ Producer 内置实现
+ *
  * @author liulin
  * @version $Id: RocketTemplate.java, v0.1 2020/7/14 14:28 liulin Exp $$
  */
@@ -18,12 +20,21 @@ public class RocketTemplate implements RocketProducer {
     public static final Logger logger = LoggerFactory.getLogger(RocketTemplate.class);
     private DefaultMQProducer mqProducer;
 
+    /**
+     * @param namesrvAddr   namesrvAddr
+     * @param producerGroup 消费者组
+     */
     public RocketTemplate(String namesrvAddr, String producerGroup) {
         mqProducer = new DefaultMQProducer();
         mqProducer.setNamesrvAddr(namesrvAddr);
         mqProducer.setProducerGroup(producerGroup);
     }
 
+    /**
+     * 消费者实例
+     *
+     * @param mqProducer
+     */
     public RocketTemplate(DefaultMQProducer mqProducer) {
         this.mqProducer = mqProducer;
     }
@@ -42,7 +53,7 @@ public class RocketTemplate implements RocketProducer {
     public boolean send(String topic, String body) {
         Message message = new Message();
         message.setTopic(topic);
-        byte[] bytes = new byte[0];
+        byte[] bytes;
         if (body != null) {
             try {
                 bytes = body.getBytes(DEFAULT_ENCODING);
